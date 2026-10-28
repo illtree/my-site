@@ -1,0 +1,44 @@
+{{ define "main" }}
+<article class="project-single">
+  <header class="page-header">
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 0.5rem;">
+      <h1 class="page-title" style="margin-bottom: 0;">{{ .Title }}</h1>
+      {{ with .Params.status }}
+        {{ $statusClass := "status-concept" }}
+        {{ if or (eq . "进行中") (eq . "开发中") (eq . "已上线") }}
+          {{ $statusClass = "status-active" }}
+        {{ else if or (eq . "原型阶段") (eq . "原型设计") (eq . "验证中") (eq . "迭代中") }}
+          {{ $statusClass = "status-prototype" }}
+        {{ end }}
+        <span class="status-badge {{ $statusClass }}" style="font-size: 0.85rem; padding: 0.2rem 0.75rem;">{{ . }}</span>
+      {{ end }}
+    </div>
+
+    {{ with .Description }}
+      <p class="hero-desc" style="margin-top: 0.8rem; margin-bottom: 1rem;">{{ . }}</p>
+    {{ end }}
+
+    <div class="page-meta" style="align-items: center;">
+      {{ if not .Date.IsZero }}
+        <span>更新于 {{ .Date.Format "2006-01-02" }}</span>
+      {{ end }}
+      {{ with .Params.tags }}
+        <div class="project-card-tags">
+          {{ range . }}
+            <span class="tag">#{{ . }}</span>
+          {{ end }}
+        </div>
+      {{ end }}
+    </div>
+  </header>
+
+  <div class="prose">
+    {{ .Content }}
+  </div>
+
+  <footer style="margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px dashed var(--border-color); display: flex; justify-content: space-between;">
+    <a href="{{ "/projects/" | relURL }}" style="color: var(--accent-color); font-size: 0.95rem;">&larr; 返回项目列表</a>
+    <a href="#top" style="color: var(--text-muted); font-size: 0.95rem;">回到顶部 &uarr;</a>
+  </footer>
+</article>
+{{ end }}

@@ -1,0 +1,24 @@
+{{ define "main" }}
+<article class="post-single">
+  <header class="page-header">
+    <h1 class="page-title">{{ .Title }}</h1>
+    <div class="page-meta">
+      <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006年01月02日" }}</time>
+      <span>约 {{ .WordCount }} 字</span>
+      <span>阅读需 {{ .ReadingTime }} 分钟</span>
+      {{ with .Params.tags }}
+        <span>标签：{{ delimit . ", " }}</span>
+      {{ end }}
+    </div>
+  </header>
+
+  <div class="prose">
+    {{ .Content }}
+  </div>
+
+  <footer style="margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px dashed var(--border-color); display: flex; justify-content: space-between;">
+    <a href="{{ "/posts/" | relURL }}" style="color: var(--accent-color); font-size: 0.95rem;">&larr; 返回文章列表</a>
+    <a href="#top" style="color: var(--text-muted); font-size: 0.95rem;">回到顶部 &uarr;</a>
+  </footer>
+</article>
+{{ end }}

@@ -1,0 +1,37 @@
+{{ define "main" }}
+<div class="projects-page">
+  <header class="page-header">
+    <h1 class="page-title">项目作品</h1>
+    <p class="hero-desc">探索软件工程、交互设计与实用工具的实验性项目集。</p>
+  </header>
+
+  <div class="project-grid">
+    {{ range .Pages }}
+      <a href="{{ .RelPermalink }}" class="project-card">
+        <div class="project-card-head">
+          <h2 class="project-card-title">{{ .Title }}</h2>
+          {{ with .Params.status }}
+            {{ $statusClass := "status-concept" }}
+            {{ if or (eq . "进行中") (eq . "开发中") (eq . "已上线") }}
+              {{ $statusClass = "status-active" }}
+            {{ else if or (eq . "原型阶段") (eq . "原型设计") (eq . "验证中") (eq . "迭代中") }}
+              {{ $statusClass = "status-prototype" }}
+            {{ end }}
+            <span class="status-badge {{ $statusClass }}">{{ . }}</span>
+          {{ end }}
+        </div>
+        <p class="project-card-desc">{{ .Description | default .Summary }}</p>
+        {{ with .Params.tags }}
+          <div class="project-card-tags">
+            {{ range . }}
+              <span class="tag">#{{ . }}</span>
+            {{ end }}
+          </div>
+        {{ end }}
+      </a>
+    {{ else }}
+      <p class="text-muted">暂无项目内容。</p>
+    {{ end }}
+  </div>
+</div>
+{{ end }}

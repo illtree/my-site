@@ -1,0 +1,36 @@
+<footer class="site-footer">
+  <div class="site-wrap">
+    <div class="footer-inner">
+      <div class="footer-copy">
+        &copy; {{ now.Format "2006" }} {{ .Site.Params.author | default .Site.Title }}. 保留所有权利。
+      </div>
+      <div class="footer-quote">
+        {{ .Site.Params.footerText }}
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  (function() {
+    const toggleBtn = document.getElementById('theme-toggle');
+    if (!toggleBtn) return;
+
+    toggleBtn.addEventListener('click', function() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      let newTheme;
+      if (currentTheme === 'dark') {
+        newTheme = 'light';
+      } else if (currentTheme === 'light') {
+        newTheme = 'dark';
+      } else {
+        // currently using system preference
+        const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        newTheme = isSystemDark ? 'light' : 'dark';
+      }
+
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+    });
+  })();
+</script>

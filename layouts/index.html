@@ -1,0 +1,76 @@
+{{ define "main" }}
+<div class="homepage">
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-tag">Digital Garden · 独立空间</div>
+    <h1 class="hero-title">{{ .Site.Params.tagline }}</h1>
+    <p class="hero-desc">
+      {{ .Site.Params.description }}
+      这里是我的个人数字档案，不追求喧闹的数据流，只做有深度的沉淀与真实的探索记录。
+    </p>
+  </section>
+
+  <!-- Projects Section -->
+  <section class="section-block">
+    <div class="section-head">
+      <h2 class="section-title">项目作品</h2>
+      <a href="{{ "/projects/" | relURL }}" class="section-more">查看全部 ({{ len (where .Site.RegularPages "Section" "projects") }}) &rarr;</a>
+    </div>
+
+    <div class="project-grid">
+      {{ range first 3 (where .Site.RegularPages "Section" "projects") }}
+        <a href="{{ .RelPermalink }}" class="project-card">
+          <div class="project-card-head">
+            <h3 class="project-card-title">{{ .Title }}</h3>
+            {{ with .Params.status }}
+              {{ $statusClass := "status-concept" }}
+              {{ if or (eq . "进行中") (eq . "开发中") (eq . "已上线") }}
+                {{ $statusClass = "status-active" }}
+              {{ else if or (eq . "原型阶段") (eq . "原型设计") (eq . "验证中") (eq . "迭代中") }}
+                {{ $statusClass = "status-prototype" }}
+              {{ end }}
+              <span class="status-badge {{ $statusClass }}">{{ . }}</span>
+            {{ end }}
+          </div>
+          <p class="project-card-desc">{{ .Description | default .Summary }}</p>
+          {{ with .Params.tags }}
+            <div class="project-card-tags">
+              {{ range . }}
+                <span class="tag">#{{ . }}</span>
+              {{ end }}
+            </div>
+          {{ end }}
+        </a>
+      {{ else }}
+        <p class="text-muted">暂无项目内容。</p>
+      {{ end }}
+    </div>
+  </section>
+
+  <!-- Latest Posts Section -->
+  <section class="section-block">
+    <div class="section-head">
+      <h2 class="section-title">最新文章</h2>
+      <a href="{{ "/posts/" | relURL }}" class="section-more">浏览专栏 &rarr;</a>
+    </div>
+
+    <div class="post-list">
+      {{ range first 5 (where .Site.RegularPages "Section" "posts") }}
+        <article class="post-item">
+          <div class="post-item-top">
+            <a href="{{ .RelPermalink }}" class="post-item-title">{{ .Title }}</a>
+            <time class="post-item-date" datetime="{{ .Date.Format "2006-01-02" }}">
+              {{ .Date.Format "2006-01-02" }}
+            </time>
+          </div>
+          {{ with .Description | default .Summary }}
+            <p class="post-item-summary">{{ . }}</p>
+          {{ end }}
+        </article>
+      {{ else }}
+        <p class="text-muted">暂无发布文章。</p>
+      {{ end }}
+    </div>
+  </section>
+</div>
+{{ end }}

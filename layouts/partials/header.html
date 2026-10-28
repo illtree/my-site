@@ -1,0 +1,43 @@
+<header class="site-header">
+  <div class="site-wrap">
+    <div class="header-inner">
+      <a href="{{ "/" | relURL }}" class="brand" aria-label="回到首页">
+        <span class="brand-badge"></span>
+        <span>{{ .Site.Title }}</span>
+      </a>
+
+      <div class="nav-group">
+        <nav class="site-nav" aria-label="主导航">
+          <ul class="nav-links">
+            {{ $currentPage := . }}
+            {{ range .Site.Menus.main }}
+              {{ $isActive := or ($currentPage.IsMenuCurrent "main" .) ($currentPage.HasMenuCurrent "main" .) }}
+              {{ if and (not $isActive) (eq .URL "/") }}
+                {{ $isActive = $currentPage.IsHome }}
+              {{ else if and (not $isActive) (ne .URL "/") }}
+                {{ $isActive = in $currentPage.RelPermalink .URL }}
+              {{ end }}
+              <li class="nav-item{{ if $isActive }} active{{ end }}">
+                <a href="{{ .URL | relURL }}">{{ .Name }}</a>
+              </li>
+            {{ end }}
+          </ul>
+        </nav>
+
+        <button id="theme-toggle" class="theme-btn" aria-label="切换浅色/深色主题" title="切换主题">
+          <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
