@@ -1,36 +1,67 @@
 {{ define "main" }}
-<div class="page-list">
-  <nav class="breadcrumb" aria-label="面包屑路径" style="font-size: 0.85rem; color: var(--text-subtle); margin-bottom: 1.5rem;">
-    <a href="{{ "/" | relURL }}" style="color: var(--text-muted);">首页</a>
-    <span style="margin: 0 0.5rem; opacity: 0.5;">/</span>
-    <span>{{ .Title }}</span>
+<header class="page-heading wrap">
+  <nav class="breadcrumb" aria-label="面包屑路径" style="font-size: 0.85rem; color: var(--quiet); margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.5rem;">
+    <a href="{{ "/" | relURL }}" style="color: var(--muted); font-weight: 500;">首页</a>
+    <span style="opacity: 0.4;">/</span>
+    <span>{{ if eq .Section "posts" }}文章{{ else if eq .Section "projects" }}项目{{ else if eq .Section "artworks" }}画作{{ else }}{{ .Title }}{{ end }}</span>
   </nav>
 
-  <header class="page-header">
-    <h1 class="page-title">{{ .Title }}</h1>
-    {{ with .Description }}
-      <p class="hero-desc">{{ . }}</p>
-    {{ end }}
-  </header>
-
-  <div class="post-list">
-    {{ range .Pages }}
-      <article class="post-item">
-        <div class="post-item-top">
-          <a href="{{ .RelPermalink }}" class="post-item-title">{{ .Title }}</a>
-          {{ if not .Date.IsZero }}
-            <time class="post-item-date" datetime="{{ .Date.Format "2006-01-02" }}">
-              {{ .Date.Format "2006-01-02" }}
-            </time>
-          {{ end }}
-        </div>
-        {{ with .Description | default .Summary }}
-          <p class="post-item-summary">{{ . }}</p>
-        {{ end }}
-      </article>
-    {{ else }}
-      <p class="text-muted">本栏目暂无内容。</p>
-    {{ end }}
+  <p class="eyebrow">{{ if eq .Section "posts" }}FIELD NOTES · 随手记录{{ else if eq .Section "projects" }}SELECTED WORK · 精选项目{{ else if eq .Section "artworks" }}DRAWING DESK · 画作{{ else }}PERSONAL ARCHIVE · 个人空间{{ end }}</p>
+  <div class="page-heading-row">
+    <h1>{{ .Title }}<span class="heading-period">.</span></h1>
+    {{ with .Description }}<p>{{ . }}</p>{{ end }}
   </div>
+</header>
+
+{{ with .Content }}
+  <div class="content-body wrap list-intro">{{ . }}</div>
+{{ end }}
+
+{{ if eq .Section "projects" }}
+<div class="project-grid listing-projects wrap">
+  {{ range .Pages.ByDate.Reverse }}
+  <a class="project-card" href="{{ .RelPermalink }}">
+    <div class="project-card-top">
+      <span class="card-index">{{ with .Params.category }}{{ . }}{{ else }}个人项目{{ end }}</span>
+    </div>
+    <h2>{{ .Title }}</h2>
+    <p>{{ .Description | default .Summary }}</p>
+    <span class="card-status">{{ with .Params.status }}{{ . }}{{ else }}持续探索{{ end }}</span>
+  </a>
+  {{ end }}
 </div>
+
+{{ else if eq .Section "artworks" }}
+<div class="artwork-grid wrap">
+  {{ range .Pages.ByDate.Reverse }}
+  <a class="artwork-card" href="{{ .RelPermalink }}">
+    <div class="artwork-image">
+      {{ with .Params.image }}
+        <img src="{{ . | relURL }}" alt="{{ $.Title }}">
+      {{ else }}
+        <div class="artwork-placeholder">
+          <span class="placeholder-mark">✳</span>
+          <span>把作品图片放在<br><code>static/artworks/</code></span>
+        </div>
+      {{ end }}
+    </div>
+    <div class="artwork-meta">
+      <span>{{ .Title }}</span>
+      <time>{{ .Date.Format "2006" }}</time>
+    </div>
+    <span class="artwork-medium">{{ with .Params.medium }}{{ . }}{{ else }}作品模板 · 添加图片后展示{{ end }}</span>
+  </a>
+  {{ end }}
+</div>
+
+{{ else }}
+<div class="post-list listing-posts wrap">
+  {{ range .Pages.ByDate.Reverse }}
+  <a class="post-row" href="{{ .RelPermalink }}">
+    <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006.01.02" }}</time>
+    <span>{{ .Title }}</span>
+  </a>
+  {{ end }}
+</div>
+{{ end }}
 {{ end }}

@@ -1,35 +1,41 @@
 {{ define "main" }}
-<article class="page-single">
-  <nav class="breadcrumb" aria-label="面包屑路径" style="font-size: 0.85rem; color: var(--text-subtle); margin-bottom: 1.5rem;">
-    <a href="{{ "/" | relURL }}" style="color: var(--text-muted);">首页</a>
-    <span style="margin: 0 0.5rem; opacity: 0.5;">/</span>
-    <span>{{ .Title }}</span>
+<article class="article wrap">
+  <nav class="breadcrumb" aria-label="面包屑路径" style="font-size: 0.85rem; color: var(--quiet); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+    <a href="{{ "/" | relURL }}" style="color: var(--muted); font-weight: 500;">首页</a>
+    <span style="opacity: 0.4;">/</span>
+    <a href="{{ .Section | relURL }}" style="color: var(--muted);">{{ if eq .Section "posts" }}文章{{ else if eq .Section "artworks" }}画作{{ else }}项目{{ end }}</a>
+    <span style="opacity: 0.4;">/</span>
+    <span>正文</span>
   </nav>
 
-  <header class="page-header">
-    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
-      <svg style="width: 1.75rem; height: 1.75rem; color: var(--accent-color); flex-shrink: 0;" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <rect x="3.5" y="6.5" width="25" height="19" rx="4"/>
-        <path d="M4 8.5L14.3 16.5C15.3 17.2 16.7 17.2 17.7 16.5L28 8.5"/>
-        <circle cx="16" cy="18.5" r="1.2" fill="currentColor"/>
-      </svg>
-      <h1 class="page-title" style="margin-bottom: 0;">{{ .Title }}</h1>
-    </div>
-    {{ if not .Date.IsZero }}
-      <div class="page-meta">
-        <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006年01月02日" }}</time>
-        {{ with .Params.author }}<span>{{ . }}</span>{{ end }}
-      </div>
+  <header class="article-header">
+    <a class="back-link" href="{{ .Section | relURL }}">← 返回{{ if eq .Section "posts" }}文章{{ else if eq .Section "artworks" }}画作{{ else }}项目{{ end }}列表</a>
+    <p class="eyebrow">{{ if eq .Section "posts" }}FIELD NOTE · 随手记录{{ else if eq .Section "artworks" }}DRAWING DESK · 画作{{ else }}PROJECT NOTE · 项目笔记{{ end }}</p>
+    <h1>{{ .Title }}</h1>
+    {{ if eq .Section "posts" }}
+      <time class="article-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006年1月2日" }}</time>
+    {{ else if eq .Section "projects" }}
+      {{ with .Params.status }}<span class="status">{{ . }}</span>{{ end }}
     {{ end }}
+    {{ with .Description }}<p class="article-description">{{ . }}</p>{{ end }}
   </header>
 
-  <div class="prose">
-    {{ .Content }}
-  </div>
+  {{ if and (eq .Section "artworks") .Params.image }}
+    <figure class="article-artwork">
+      <img src="{{ .Params.image | relURL }}" alt="{{ .Title }}">
+      {{ with .Params.medium }}<figcaption>{{ . }}</figcaption>{{ end }}
+    </figure>
+  {{ end }}
 
-  <footer style="margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px dashed var(--border-color); display: flex; justify-content: space-between; align-items: center;">
-    <a href="{{ "/" | relURL }}" style="color: var(--accent-color); font-weight: 500; font-size: 0.95rem;">返回首页</a>
-    <a href="#top" style="color: var(--text-subtle); font-size: 0.95rem;">回到顶部</a>
+  <div class="content-body">{{ .Content }}</div>
+
+  <footer style="margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px dashed var(--line); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div style="display: flex; align-items: center; gap: 1.25rem;">
+      <a href="{{ "/" | relURL }}" style="color: var(--accent); font-weight: 500; font-size: 0.95rem;">返回首页</a>
+      <span style="color: var(--line);">|</span>
+      <a href="{{ .Section | relURL }}" style="color: var(--muted); font-size: 0.95rem;">返回{{ if eq .Section "posts" }}文章{{ else if eq .Section "artworks" }}画作{{ else }}项目{{ end }}列表</a>
+    </div>
+    <a href="#top" style="color: var(--quiet); font-size: 0.95rem;">回到顶部</a>
   </footer>
 </article>
 {{ end }}

@@ -10,8 +10,10 @@ summaryLength = 120
 
 [params]
   author = '站长'
-  tagline = '记录思考，展示作品，持续实验'
-  description = '一个专注于软件设计、个人项目与技术思考的独立数字空间。'
+  name = '个人数字空间'
+  description = '专注于软件设计、个人项目与技术思考的独立数字空间。'
+  location = '在这里写下所在城市'
+  email = 'hello@example.com'
   footerText = '保持好奇，持续构建。'
 
 [menus]
@@ -31,6 +33,11 @@ summaryLength = 120
     weight = 3
 
   [[menus.main]]
+    name = '画作'
+    pageRef = '/artworks'
+    weight = 4
+
+  [[menus.main]]
     name = '关于'
     pageRef = '/about'
-    weight = 4
+    weight = 5

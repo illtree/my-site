@@ -1,0 +1,42 @@
+{{ define "main" }}
+<article class="article wrap about-page">
+  <nav class="breadcrumb" aria-label="面包屑路径" style="font-size: 0.85rem; color: var(--muted); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+    <a href="{{ "/" | relURL }}" style="color: var(--muted); font-weight: 500;">首页</a>
+    <span style="opacity: 0.4;">/</span>
+    <span>关于我</span>
+  </nav>
+
+  <header class="article-header">
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+      <svg class="page-head-icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="width: 1.85rem; height: 1.85rem; color: var(--accent);">
+        <rect x="3.5" y="6.5" width="25" height="19" rx="4"/>
+        <path d="M4 8.5L14.3 16.5C15.3 17.2 16.7 17.2 17.7 16.5L28 8.5"/>
+        <circle cx="16" cy="18.5" r="1.2" fill="currentColor"/>
+      </svg>
+      <h1 style="margin: 0;">{{ .Title }}<span class="heading-period">.</span></h1>
+    </div>
+  </header>
+
+  <div class="about-meta">
+    <span class="about-monogram">{{ with .Site.Params.name }}{{ substr . 0 1 }}{{ else }}我{{ end }}</span>
+    <div>
+      <strong>{{ .Site.Params.name | default .Site.Params.author }}</strong>
+      <span>{{ .Site.Params.location }}</span>
+    </div>
+  </div>
+
+  <div class="content-body">
+    {{ .Content }}
+  </div>
+
+  <a class="contact-card" href="mailto:{{ .Site.Params.email }}">
+    <span>想聊聊？欢迎来信。</span>
+    <strong>{{ .Site.Params.email }}</strong>
+  </a>
+
+  <footer style="margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px dashed var(--line); display: flex; justify-content: space-between; align-items: center;">
+    <a href="{{ "/" | relURL }}" style="color: var(--accent); font-weight: 500; font-size: 0.95rem;">返回首页</a>
+    <a href="#top" style="color: var(--quiet); font-size: 0.95rem;">回到顶部</a>
+  </footer>
+</article>
+{{ end }}

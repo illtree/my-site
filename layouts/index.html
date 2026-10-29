@@ -1,83 +1,41 @@
 {{ define "main" }}
-<div class="homepage">
-  <!-- Projects Section -->
-  <section class="section-block">
-    <div class="section-head">
-      <div class="section-title-wrap">
-        <svg class="section-head-icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M16 2.5L27 9V23L16 29.5L5 23V9L16 2.5Z"/>
-          <path d="M16 2.5V16.5M27 9L16 16.5M5 9L16 16.5"/>
-          <path d="M16 16.5V29.5"/>
-          <circle cx="16" cy="16.5" r="1.5" fill="currentColor"/>
-        </svg>
-        <h2 class="section-title">项目作品</h2>
-      </div>
-      <a href="{{ "/projects/" | relURL }}" class="section-more">查看全部 ({{ len (where .Site.RegularPages "Section" "projects") }})</a>
-    </div>
+<section class="home wrap">
+  <div class="card-grid">
+    {{/* 1. 精选项目卡片 */}}
+    {{ range first 3 (where .Site.RegularPages "Section" "projects") }}
+    <a class="entry-card" href="{{ .RelPermalink }}">
+      <span class="card-top">
+        <span class="card-label">项目</span>
+      </span>
+      <strong class="card-title">{{ .Title }}</strong>
+      <span class="card-description">{{ .Description | default .Summary }}</span>
+      <span class="card-status">{{ with .Params.status }}{{ . }}{{ else }}个人项目{{ end }}</span>
+    </a>
+    {{ end }}
 
-    <div class="project-grid">
-      {{ range first 3 (where .Site.RegularPages "Section" "projects") }}
-        <a href="{{ .RelPermalink }}" class="project-card">
-          <div class="project-card-head">
-            <h3 class="project-card-title">{{ .Title }}</h3>
-            {{ with .Params.status }}
-              {{ $statusClass := "status-concept" }}
-              {{ if or (eq . "进行中") (eq . "开发中") (eq . "已上线") }}
-                {{ $statusClass = "status-active" }}
-              {{ else if or (eq . "原型阶段") (eq . "原型设计") (eq . "验证中") (eq . "迭代中") }}
-                {{ $statusClass = "status-prototype" }}
-              {{ end }}
-              <span class="status-badge {{ $statusClass }}">{{ . }}</span>
-            {{ end }}
-          </div>
-          <p class="project-card-desc">{{ .Description | default .Summary }}</p>
-          {{ with .Params.tags }}
-            <div class="project-card-tags">
-              {{ range . }}
-                <span class="tag">#{{ . }}</span>
-              {{ end }}
-            </div>
-          {{ end }}
-        </a>
-      {{ else }}
-        <p class="text-muted">暂无项目内容。</p>
+    {{/* 2. 最新文章卡片 */}}
+    {{ with (first 1 (where .Site.RegularPages "Section" "posts")) }}
+      {{ range . }}
+      <a class="entry-card" href="{{ .RelPermalink }}">
+        <span class="card-top">
+          <span class="card-label">最新文章</span>
+        </span>
+        <strong class="card-title">{{ .Title }}</strong>
+        <span class="card-description">{{ .Summary | plainify | truncate 58 }}</span>
+        <time class="card-status" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006.01.02" }}</time>
+      </a>
       {{ end }}
-    </div>
-  </section>
+    {{ end }}
 
-  <!-- Latest Posts Section -->
-  <section class="section-block">
-    <div class="section-head">
-      <div class="section-title-wrap">
-        <svg class="section-head-icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M7 5C7 3.9 7.9 3 9 3H20L25 8V27C25 28.1 24.1 29 23 29H9C7.9 29 7 28.1 7 27V5Z"/>
-          <path d="M19 3V9H25"/>
-          <line x1="11" y1="14" x2="21" y2="14"/>
-          <line x1="11" y1="18.5" x2="21" y2="18.5"/>
-          <line x1="11" y1="23" x2="16.5" y2="23"/>
-        </svg>
-        <h2 class="section-title">最新文章</h2>
-      </div>
-      <a href="{{ "/posts/" | relURL }}" class="section-more">浏览专栏</a>
-    </div>
-
-    <div class="post-list">
-      {{ range first 5 (where .Site.RegularPages "Section" "posts") }}
-        <article class="post-item">
-          <div class="post-item-top">
-            <a href="{{ .RelPermalink }}" class="post-item-title">{{ .Title }}</a>
-            <time class="post-item-date" datetime="{{ .Date.Format "2006-01-02" }}">
-              {{ .Date.Format "2006-01-02" }}
-            </time>
-          </div>
-          {{ with .Description | default .Summary }}
-            <p class="post-item-summary">{{ . }}</p>
-          {{ end }}
-        </article>
-      {{ else }}
-        <p class="text-muted">暂无发布文章。</p>
-      {{ end }}
-    </div>
-  </section>
-</div>
+    {{/* 3. 画作作品卡片 */}}
+    <a class="entry-card" href="{{ "artworks/" | relURL }}">
+      <span class="card-top">
+        <span class="card-label">画作</span>
+      </span>
+      <strong class="card-title">图画作品</strong>
+      <span class="card-description">一页收集画画作品。</span>
+      <span class="card-status">作品集</span>
+    </a>
+  </div>
+</section>
 {{ end }}
