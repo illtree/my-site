@@ -1,20 +1,18 @@
 {{ define "main" }}
 <div class="homepage">
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="hero-tag">Digital Garden · 独立空间</div>
-    <h1 class="hero-title">{{ .Site.Params.tagline }}</h1>
-    <p class="hero-desc">
-      {{ .Site.Params.description }}
-      这里是我的个人数字档案，不追求喧闹的数据流，只做有深度的沉淀与真实的探索记录。
-    </p>
-  </section>
-
   <!-- Projects Section -->
   <section class="section-block">
     <div class="section-head">
-      <h2 class="section-title">项目作品</h2>
-      <a href="{{ "/projects/" | relURL }}" class="section-more">查看全部 ({{ len (where .Site.RegularPages "Section" "projects") }}) &rarr;</a>
+      <div class="section-title-wrap">
+        <svg class="section-head-icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M16 2.5L27 9V23L16 29.5L5 23V9L16 2.5Z"/>
+          <path d="M16 2.5V16.5M27 9L16 16.5M5 9L16 16.5"/>
+          <path d="M16 16.5V29.5"/>
+          <circle cx="16" cy="16.5" r="1.5" fill="currentColor"/>
+        </svg>
+        <h2 class="section-title">项目作品</h2>
+      </div>
+      <a href="{{ "/projects/" | relURL }}" class="section-more">查看全部 ({{ len (where .Site.RegularPages "Section" "projects") }})</a>
     </div>
 
     <div class="project-grid">
@@ -50,8 +48,17 @@
   <!-- Latest Posts Section -->
   <section class="section-block">
     <div class="section-head">
-      <h2 class="section-title">最新文章</h2>
-      <a href="{{ "/posts/" | relURL }}" class="section-more">浏览专栏 &rarr;</a>
+      <div class="section-title-wrap">
+        <svg class="section-head-icon" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M7 5C7 3.9 7.9 3 9 3H20L25 8V27C25 28.1 24.1 29 23 29H9C7.9 29 7 28.1 7 27V5Z"/>
+          <path d="M19 3V9H25"/>
+          <line x1="11" y1="14" x2="21" y2="14"/>
+          <line x1="11" y1="18.5" x2="21" y2="18.5"/>
+          <line x1="11" y1="23" x2="16.5" y2="23"/>
+        </svg>
+        <h2 class="section-title">最新文章</h2>
+      </div>
+      <a href="{{ "/posts/" | relURL }}" class="section-more">浏览专栏</a>
     </div>
 
     <div class="post-list">

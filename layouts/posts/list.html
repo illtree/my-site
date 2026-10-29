@@ -1,7 +1,22 @@
 {{ define "main" }}
 <div class="posts-page">
+  <nav class="breadcrumb" aria-label="面包屑路径" style="font-size: 0.85rem; color: var(--text-subtle); margin-bottom: 1.5rem;">
+    <a href="{{ "/" | relURL }}" style="color: var(--text-muted);">首页</a>
+    <span style="margin: 0 0.5rem; opacity: 0.5;">/</span>
+    <span>文章</span>
+  </nav>
+
   <header class="page-header">
-    <h1 class="page-title">文章与思考</h1>
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+      <svg style="width: 1.75rem; height: 1.75rem; color: var(--accent-color); flex-shrink: 0;" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M7 5C7 3.9 7.9 3 9 3H20L25 8V27C25 28.1 24.1 29 23 29H9C7.9 29 7 28.1 7 27V5Z"/>
+        <path d="M19 3V9H25"/>
+        <line x1="11" y1="14" x2="21" y2="14"/>
+        <line x1="11" y1="18.5" x2="21" y2="18.5"/>
+        <line x1="11" y1="23" x2="16.5" y2="23"/>
+      </svg>
+      <h1 class="page-title" style="margin-bottom: 0;">文章与思考</h1>
+    </div>
     <p class="hero-desc">关于软件开发、产品设计、工具与生活观察的记录。</p>
   </header>
 

@@ -1,7 +1,21 @@
 {{ define "main" }}
 <div class="projects-page">
+  <nav class="breadcrumb" aria-label="面包屑路径" style="font-size: 0.85rem; color: var(--text-subtle); margin-bottom: 1.5rem;">
+    <a href="{{ "/" | relURL }}" style="color: var(--text-muted);">首页</a>
+    <span style="margin: 0 0.5rem; opacity: 0.5;">/</span>
+    <span>项目</span>
+  </nav>
+
   <header class="page-header">
-    <h1 class="page-title">项目作品</h1>
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+      <svg style="width: 1.75rem; height: 1.75rem; color: var(--accent-color); flex-shrink: 0;" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M16 2.5L27 9V23L16 29.5L5 23V9L16 2.5Z"/>
+        <path d="M16 2.5V16.5M27 9L16 16.5M5 9L16 16.5"/>
+        <path d="M16 16.5V29.5"/>
+        <circle cx="16" cy="16.5" r="1.5" fill="currentColor"/>
+      </svg>
+      <h1 class="page-title" style="margin-bottom: 0;">项目作品</h1>
+    </div>
     <p class="hero-desc">探索软件工程、交互设计与实用工具的实验性项目集。</p>
   </header>
 
