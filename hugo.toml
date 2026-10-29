@@ -1,6 +1,6 @@
 baseURL = '/'
 defaultContentLanguage = 'zh'
-title = '个人数字空间'
+title = 'Folio'
 hasCJKLanguage = true
 summaryLength = 120
 
@@ -9,35 +9,9 @@ summaryLength = 120
   label = '简体中文'
 
 [params]
-  author = '站长'
-  name = '个人数字空间'
+  author = 'Folio'
+  name = 'Folio'
   description = '专注于软件设计、个人项目与技术思考的独立数字空间。'
   location = '在这里写下所在城市'
   email = 'hello@example.com'
   footerText = '保持好奇，持续构建。'
-
-[menus]
-  [[menus.main]]
-    name = '首页'
-    pageRef = '/'
-    weight = 1
-
-  [[menus.main]]
-    name = '文章'
-    pageRef = '/posts'
-    weight = 2
-
-  [[menus.main]]
-    name = '项目'
-    pageRef = '/projects'
-    weight = 3
-
-  [[menus.main]]
-    name = '画作'
-    pageRef = '/artworks'
-    weight = 4
-
-  [[menus.main]]
-    name = '关于'
-    pageRef = '/about'
-    weight = 5
