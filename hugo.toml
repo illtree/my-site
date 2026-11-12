@@ -15,3 +15,8 @@ summaryLength = 120
   location = '在这里写下所在城市'
   email = 'hello@example.com'
   footerText = '保持好奇，持续构建。'
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
