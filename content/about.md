@@ -26,9 +26,9 @@ description: "关于本站作者、设计理念与技术思考。"
 
 如果你对我的项目感兴趣，或者有任何想法与建议，欢迎通过以下方式与我交流：
 
-- **GitHub**：[github.com/your-username](https://github.com) *(占位示例)*
-- **电子邮箱**：`hello@example.com` *(占位示例)*
-- **即时通讯**：微信 / 即刻 *(按需配置)*
+- **GitHub**：[github.com/illtree](https://github.com/illtree)
+- **电子邮箱**：`alwaysyys@hotmail.com`
+- **微信小程序**：微信搜索“**来约场球**”
 
 ---
 > *“保持好奇，持续构建。”*

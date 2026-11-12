@@ -27,7 +27,8 @@
       {{ end }}
     {{ end }}
 
-    {{/* 3. 画作作品卡片 */}}
+    {{/* 3. 画作作品卡片 (支持配置开关) */}}
+    {{ if .Site.Params.showArtworks }}
     <a class="entry-card" href="{{ "artworks/" | relURL }}">
       <span class="card-top">
         <span class="card-label">画作</span>
@@ -36,6 +37,7 @@
       <span class="card-description">一页收集画画作品。</span>
       <span class="card-status">作品集</span>
     </a>
+    {{ end }}
   </div>
 </section>
 {{ end }}

@@ -111,7 +111,7 @@ describe('Folio 个人数字空间工程自动化测试套件', () => {
     assert.ok(html.includes('footer-icon-dock'), '底部必须包含快捷入口图标 Dock');
     assert.ok(html.includes('href="/posts/"'), 'Dock 必须包含文章入口');
     assert.ok(html.includes('href="/projects/"'), 'Dock 必须包含项目入口');
-    assert.ok(html.includes('href="/artworks/"'), 'Dock 必须包含画作入口');
+    assert.ok(html.includes('mailto:alwaysyys@hotmail.com'), 'Dock 必须包含已配置的邮件入口');
 
     // 主题切换器
     assert.ok(html.includes('id="theme-toggle"'), '必须包含深色/浅色主题切换按钮');

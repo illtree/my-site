@@ -12,8 +12,9 @@ summaryLength = 120
   author = 'Folio'
   name = 'Folio'
   description = '专注于软件设计、个人项目与技术思考的独立数字空间。'
-  location = '在这里写下所在城市'
-  email = 'hello@example.com'
+  location = ''
+  email = 'alwaysyys@hotmail.com'
+  showArtworks = false
   footerText = '保持好奇，持续构建。'
 
 [markup]

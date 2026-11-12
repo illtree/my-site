@@ -17,6 +17,7 @@
         <circle cx="16" cy="16.5" r="1.5" fill="currentColor"/>
       </svg>
     </a>
+    {{ if .Site.Params.showArtworks }}
     <a class="footer-icon" href="{{ "artworks/" | relURL }}" aria-label="图画作品" title="图画作品">
       <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <rect x="4" y="4" width="24" height="24" rx="5"/>
@@ -25,6 +26,7 @@
         <path d="M14 28L18 24C21 21 23 22 28 25"/>
       </svg>
     </a>
+    {{ end }}
     <a class="footer-icon" href="mailto:{{ .Site.Params.email }}" aria-label="邮件联系" title="邮件联系">
       <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <rect x="3.5" y="6.5" width="25" height="19" rx="4"/>
