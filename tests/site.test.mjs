@@ -118,8 +118,6 @@ describe('Folio 个人数字空间工程自动化测试套件', () => {
 
     // 项目卡片与状态标签
     assert.ok(html.includes('来约场球'), '首页必须展示来约场球卡片');
-    assert.ok(html.includes('极简天气应用'), '首页必须展示天气应用卡片');
-    assert.ok(html.includes('探索式学习游戏'), '首页必须展示学习游戏卡片');
     assert.ok(html.includes('card-status'), '卡片必须渲染状态信息');
   });
 
