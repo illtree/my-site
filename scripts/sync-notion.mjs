@@ -171,7 +171,13 @@ async function fetchPagesFromDatabase(databaseId) {
 }
 
 async function syncPosts() {
-  console.log('🚀 开始从 Notion 数据库拉取文章...');
+  const targetPageUrl = process.env.NOTION_PAGE_URL;
+  if (!targetPageUrl && !process.env.FORCE_SYNC_ALL) {
+    console.log('💡 [Notion 同步] 当前未指定要单篇发布的 NOTION_PAGE_URL。');
+    console.log('   为保护隐私并防止未完成草稿误发，全量自动同步已暂停。');
+    console.log('   如需发布特定文章，请传入 NOTION_PAGE_URL 或在 GitHub Actions 输入文章链接。');
+    process.exit(0);
+  }
 
   let pages = [];
   try {

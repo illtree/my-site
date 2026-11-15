@@ -4,11 +4,9 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch: # 支持在 GitHub 页面手动一键触发
-  repository_dispatch: # 支持外部 Webhook / API 秒级触发
+  workflow_dispatch: # 仅在需要时手动一键触发
+  repository_dispatch: # 支持外部指定触发
     types: [notion-publish]
-  schedule:
-    - cron: '*/30 * * * *' # 每 30 分钟自动巡检同步一次
 
 # 授予 GitHub Pages 部署和仓库内容写入权限
 permissions:
