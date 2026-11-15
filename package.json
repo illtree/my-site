@@ -5,6 +5,7 @@
   "description": "个人数字空间 - 极简 Hugo 静态博客与项目展示站",
   "scripts": {
     "test": "node --test tests/*.test.mjs",
+    "sync": "node scripts/sync-notion.mjs",
     "build": "hugo",
     "dev": "hugo server -D"
   },
@@ -15,5 +16,9 @@
     "portfolio"
   ],
   "author": "站长",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@notionhq/client": "^5.31.1",
+    "notion-to-md": "^3.1.10"
+  }
 }
