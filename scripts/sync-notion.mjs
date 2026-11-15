@@ -1,8 +1,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { Client } from '@notionhq/client';
-import { NotionToMarkdown } from 'notion-to-md';
+import notionPkg from '@notionhq/client';
+import n2mPkg from 'notion-to-md';
+
+const { Client } = notionPkg;
+const NotionToMarkdown = n2mPkg.NotionToMarkdown || n2mPkg;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
