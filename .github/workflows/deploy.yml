@@ -50,9 +50,10 @@ jobs:
       - name: Install Node Dependencies
         run: npm ci
 
-      - name: Sync Post from Notion (if specified)
+      - name: Sync Post from Notion
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DASHBOARD_ID: ${{ secrets.NOTION_DASHBOARD_ID }}
           NOTION_PAGE_URL: ${{ inputs.page_url || github.event.client_payload.page_url }}
         run: node scripts/sync-notion.mjs
 

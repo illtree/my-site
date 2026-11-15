@@ -39,50 +39,32 @@ function loadEnv() {
 loadEnv();
 
 const NOTION_TOKEN = process.env.NOTION_TOKEN;
-// 优先从命令行参数读取，其次从环境变量读取
-let targetInput = process.argv[2] || process.env.NOTION_PAGE_URL;
+// 默认【博客发布台】ID，亦可由环境变量覆盖
+const DASHBOARD_ID = process.env.NOTION_DASHBOARD_ID || '4199918d-74bb-8080-932e-eeb4b4b85f17';
+const SINGLE_PAGE_INPUT = process.argv[2] || process.env.NOTION_PAGE_URL;
 
-if (!targetInput || !targetInput.trim()) {
-  console.log('ℹ️ [Notion 精准发布] 未指定要发布的文章链接 (NOTION_PAGE_URL 为空)。');
-  console.log('   跳过 Notion 同步，直接进行常规构建与部署。');
-  console.log('   如需发布特定文章，请在 GitHub Actions 运行窗口输入文章 Share 链接。');
+if (!NOTION_TOKEN) {
+  console.log('💡 [Notion 同步] 未检测到 NOTION_TOKEN 环境变量，跳过 Notion 同步。');
   process.exit(0);
 }
 
-if (!NOTION_TOKEN) {
-  console.error('❌ 未检测到 NOTION_TOKEN 环境变量，无法访问 Notion API。');
-  process.exit(1);
-}
+const notion = new Client({ auth: NOTION_TOKEN });
+const n2m = new NotionToMarkdown({ notionClient: notion });
 
-// 辅助：从各种格式的 Notion Share 链接中提取标准的 Page ID (带破折号 UUID)
+// 辅助：从各种格式链接中提取标准 Page ID (带破折号 UUID)
 function extractPageId(input) {
+  if (!input) return null;
   const clean = input.trim();
-  // 匹配类似 4199918d-74bb-8080-932e-eeb4b4b85f17 (带连字符)
   const hyphenMatch = clean.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
-  if (hyphenMatch) {
-    return hyphenMatch[0].toLowerCase();
-  }
+  if (hyphenMatch) return hyphenMatch[0].toLowerCase();
 
-  // 匹配末尾或路径中的 32 位 hex
   const noHyphenMatch = clean.match(/([0-9a-f]{32})(?:[?&]|$)/i) || clean.match(/[0-9a-f]{32}/i);
   if (noHyphenMatch) {
     const raw = noHyphenMatch[1].toLowerCase();
     return `${raw.slice(0, 8)}-${raw.slice(8, 12)}-${raw.slice(12, 16)}-${raw.slice(16, 20)}-${raw.slice(20)}`;
   }
-
   return null;
 }
-
-const targetPageId = extractPageId(targetInput);
-
-if (!targetPageId) {
-  console.error(`❌ 无法从提供的输入中解析出合法的 Notion Page ID: "${targetInput}"`);
-  console.error('   请确保输入的是形如 https://www.notion.so/.../xxx 或 32 位 ID 的合法链接。');
-  process.exit(1);
-}
-
-const notion = new Client({ auth: NOTION_TOKEN });
-const n2m = new NotionToMarkdown({ notionClient: notion });
 
 // 辅助：安全生成文件名 Slug
 function slugify(text) {
@@ -158,23 +140,69 @@ function formatDate(dateStr) {
   return dateStr;
 }
 
-async function syncSinglePost() {
-  console.log(`🚀 开始精准拉取 Notion 页面 [ID: ${targetPageId}]...`);
+// 扫描【博客发布台】内部包含的所有文章 ID
+async function getArticleIdsFromDashboard(dashboardId) {
+  console.log(`🔍 正在扫描【博客发布台】(ID: ${dashboardId}) 的展示清单...`);
+  const articleIds = new Set();
 
+  try {
+    let hasMore = true;
+    let startCursor = undefined;
+
+    while (hasMore) {
+      const response = await notion.blocks.children.list({
+        block_id: dashboardId,
+        start_cursor: startCursor,
+        page_size: 100
+      });
+
+      for (const block of response.results) {
+        // 1. 直接拖入/创建的子页面 (child_page)
+        if (block.type === 'child_page') {
+          articleIds.add(block.id);
+        }
+        // 2. 通过 /link to page 建立的链接 (link_to_page)
+        else if (block.type === 'link_to_page' && block.link_to_page?.page_id) {
+          articleIds.add(block.link_to_page.page_id);
+        }
+        // 3. 段落、列表等文本中的 mention 或 URL
+        else if (block[block.type]?.rich_text) {
+          for (const rt of block[block.type].rich_text) {
+            if (rt.type === 'mention' && rt.mention?.type === 'page' && rt.mention.page?.id) {
+              articleIds.add(rt.mention.page.id);
+            } else if (rt.href) {
+              const parsed = extractPageId(rt.href);
+              if (parsed) articleIds.add(parsed);
+            }
+          }
+        }
+      }
+
+      hasMore = response.has_more;
+      startCursor = response.next_cursor;
+    }
+  } catch (err) {
+    console.warn(`⚠️ 读取发布台 blocks 遇到问题: ${err.message}`);
+  }
+
+  return Array.from(articleIds);
+}
+
+// 单篇页面拉取并转换为 Markdown
+async function syncPageById(pageId) {
   let page;
   try {
-    page = await notion.pages.retrieve({ page_id: targetPageId });
+    page = await notion.pages.retrieve({ page_id: pageId });
   } catch (error) {
-    console.error(`❌ 无法获取该 Notion 页面:`, error.message);
-    console.error(`   请确保该文章已对 integration 开放授权，或链接格式正确。`);
-    process.exit(1);
+    console.error(`❌ 无法访问页面 [ID: ${pageId}]:`, error.message);
+    return false;
   }
 
   const props = page.properties || {};
 
-  // 1. 获取标题 (兼容各类属性名称及纯独立页面)
+  // 1. 获取标题
   let title = '';
-  for (const [key, val] of Object.entries(props)) {
+  for (const val of Object.values(props)) {
     if (val.type === 'title' && val.title?.length > 0) {
       title = val.title.map(t => t.plain_text).join('');
       break;
@@ -183,24 +211,19 @@ async function syncSinglePost() {
   if (!title && props.title?.title?.length > 0) {
     title = props.title.title.map(t => t.plain_text).join('');
   }
-
-  if (!title.trim()) {
-    title = '未命名文章';
-  }
+  if (!title.trim()) title = '未命名文章';
 
   // 2. 获取 Slug
   let slug = '';
   if (props.Slug?.rich_text?.length > 0) {
     slug = props.Slug.rich_text.map(t => t.plain_text).join('').trim();
   }
-  if (!slug) {
-    slug = slugify(title);
-  }
+  if (!slug) slug = slugify(title);
   if (!slug || slug === 'post') {
-    slug = `post-${targetPageId.replace(/-/g, '').slice(0, 8)}`;
+    slug = `post-${pageId.replace(/-/g, '').slice(0, 8)}`;
   }
 
-  // 3. 获取日期 (兼容 Date, Created, created_time)
+  // 3. 获取日期
   let date = props.Date?.date?.start || props.Created?.created_time || page.created_time;
   const isoDate = formatDate(date);
 
@@ -222,8 +245,8 @@ async function syncSinglePost() {
   }
 
   // 6. 转换正文 Blocks 为 Markdown
-  console.log(`📄 正在转换正文排版与内容...`);
-  const mdblocks = await n2m.pageToMarkdown(targetPageId);
+  console.log(`📄 正在转换文章 [${title}] 的正文与排版...`);
+  const mdblocks = await n2m.pageToMarkdown(pageId);
   const mdStringObj = n2m.toMarkdownString(mdblocks);
   let contentMarkdown = mdStringObj.parent || '';
 
@@ -236,8 +259,7 @@ async function syncSinglePost() {
     if (!summary) summary = title;
   }
 
-  // 7. 处理图片持久化保存
-  console.log(`🖼️ 正在检查文章中的配图并持久化保存...`);
+  // 7. 处理图片持久化
   contentMarkdown = await downloadAndReplaceImages(contentMarkdown, slug);
 
   // 8. 组装 Frontmatter
@@ -262,10 +284,48 @@ ${contentMarkdown}
 
   const destPath = path.join(postsDir, `${slug}.md`);
   fs.writeFileSync(destPath, fileContent, 'utf-8');
-
-  console.log(`\n🎉 发布成功！`);
-  console.log(`   文章标题: ${title}`);
-  console.log(`   生成文件: content/posts/${slug}.md`);
+  console.log(`✨ 成功发布: [${title}] -> content/posts/${slug}.md`);
+  return true;
 }
 
-syncSinglePost();
+async function main() {
+  console.log('🚀 启动 Notion 博客发布引擎...');
+
+  let targetIds = [];
+
+  // 优先情况 A：命令行或环境变量明确指定了单篇文章
+  if (SINGLE_PAGE_INPUT) {
+    const singleId = extractPageId(SINGLE_PAGE_INPUT);
+    if (singleId) {
+      console.log(`🎯 模式: 精准发布单篇文章 (ID: ${singleId})`);
+      targetIds.push(singleId);
+    }
+  }
+
+  // 常规情况 B：从【博客发布台】展架中提取要发布的文章清单
+  if (targetIds.length === 0) {
+    const cleanDashboardId = extractPageId(DASHBOARD_ID);
+    if (cleanDashboardId) {
+      targetIds = await getArticleIdsFromDashboard(cleanDashboardId);
+    }
+  }
+
+  if (targetIds.length === 0) {
+    console.log('ℹ️ 【博客发布台】目前未放置任何要发布的文章。');
+    console.log('   提示：在 Notion 中打开【博客发布台】，打字输入 @文章标题 或拖入子页面，即可将其发布。');
+    console.log('   本次跳过 Notion 同步，保持现有站点内容不变。');
+    process.exit(0);
+  }
+
+  console.log(`📚 共发现 ${targetIds.length} 篇待发布文章，开始逐一处理...`);
+
+  let count = 0;
+  for (const id of targetIds) {
+    const ok = await syncPageById(id);
+    if (ok) count++;
+  }
+
+  console.log(`\n🎉 发布完成！共成功发布 ${count} 篇文章。`);
+}
+
+main();
