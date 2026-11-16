@@ -39,9 +39,7 @@ function loadEnv() {
 loadEnv();
 
 const NOTION_TOKEN = process.env.NOTION_TOKEN;
-// 默认【博客发布台】ID，亦可由环境变量覆盖
-const DASHBOARD_ID = process.env.NOTION_DASHBOARD_ID || '4199918d-74bb-8080-932e-eeb4b4b85f17';
-const SINGLE_PAGE_INPUT = process.argv[2] || process.env.NOTION_PAGE_URL;
+const DATABASE_ID = process.env.NOTION_DATABASE_ID || '40d46488-a2a8-4108-ab3c-262350fbe99a';
 
 if (!NOTION_TOKEN) {
   console.log('💡 [Notion 同步] 未检测到 NOTION_TOKEN 环境变量，跳过 Notion 同步。');
@@ -50,21 +48,6 @@ if (!NOTION_TOKEN) {
 
 const notion = new Client({ auth: NOTION_TOKEN });
 const n2m = new NotionToMarkdown({ notionClient: notion });
-
-// 辅助：从各种格式链接中提取标准 Page ID (带破折号 UUID)
-function extractPageId(input) {
-  if (!input) return null;
-  const clean = input.trim();
-  const hyphenMatch = clean.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
-  if (hyphenMatch) return hyphenMatch[0].toLowerCase();
-
-  const noHyphenMatch = clean.match(/([0-9a-f]{32})(?:[?&]|$)/i) || clean.match(/[0-9a-f]{32}/i);
-  if (noHyphenMatch) {
-    const raw = noHyphenMatch[1].toLowerCase();
-    return `${raw.slice(0, 8)}-${raw.slice(8, 12)}-${raw.slice(12, 16)}-${raw.slice(16, 20)}-${raw.slice(20)}`;
-  }
-  return null;
-}
 
 // 辅助：安全生成文件名 Slug
 function slugify(text) {
@@ -140,64 +123,86 @@ function formatDate(dateStr) {
   return dateStr;
 }
 
-// 扫描【博客发布台】内部包含的所有文章 ID
-async function getArticleIdsFromDashboard(dashboardId) {
-  console.log(`🔍 正在扫描【博客发布台】(ID: ${dashboardId}) 的展示清单...`);
-  const articleIds = new Set();
+// 查询数据库中所有打勾 [x] 的已发布文章
+async function fetchPublishedPagesFromDatabase(databaseId) {
+  console.log(`🔍 正在扫描 Notion 文章库 (ID: ${databaseId})...`);
 
+  let allPages = [];
   try {
-    let hasMore = true;
-    let startCursor = undefined;
-
-    while (hasMore) {
-      const response = await notion.blocks.children.list({
-        block_id: dashboardId,
-        start_cursor: startCursor,
-        page_size: 100
+    // 兼容 v5 dataSources
+    if (notion.dataSources?.query) {
+      const db = await notion.databases.retrieve({ database_id: databaseId });
+      const dsId = db.data_sources?.[0]?.id || databaseId;
+      const res = await notion.dataSources.query({ data_source_id: dsId });
+      allPages = res.results || [];
+    } else if (typeof notion.databases.query === 'function') {
+      const res = await notion.databases.query({ database_id: databaseId });
+      allPages = res.results || [];
+    } else {
+      const resp = await fetch(`https://api.notion.com/v1/databases/${databaseId}/query`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${NOTION_TOKEN}`,
+          'Notion-Version': '2022-06-28',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
       });
+      if (resp.ok) {
+        const data = await resp.json();
+        allPages = data.results || [];
+      }
+    }
+  } catch (err) {
+    console.error(`❌ 查询数据库失败: ${err.message}`);
+    return [];
+  }
 
-      for (const block of response.results) {
-        // 1. 直接拖入/创建的子页面 (child_page)
-        if (block.type === 'child_page') {
-          articleIds.add(block.id);
-        }
-        // 2. 通过 /link to page 建立的链接 (link_to_page)
-        else if (block.type === 'link_to_page' && block.link_to_page?.page_id) {
-          articleIds.add(block.link_to_page.page_id);
-        }
-        // 3. 段落、列表等文本中的 mention 或 URL
-        else if (block[block.type]?.rich_text) {
-          for (const rt of block[block.type].rich_text) {
-            if (rt.type === 'mention' && rt.mention?.type === 'page' && rt.mention.page?.id) {
-              articleIds.add(rt.mention.page.id);
-            } else if (rt.href) {
-              const parsed = extractPageId(rt.href);
-              if (parsed) articleIds.add(parsed);
-            }
+  // 严格筛选：只有明确打勾 [x] 或标为 Published 的文章才被纳入发布清单
+  const publishedPages = [];
+
+  for (const page of allPages) {
+    const props = page.properties || {};
+
+    let isPublished = false;
+
+    // 1. 优先检查 Checkbox 类型的勾选属性 (支持列名: 发布, Publish, 已发布)
+    for (const [key, val] of Object.entries(props)) {
+      if (val.type === 'checkbox') {
+        const lowerKey = key.toLowerCase();
+        if (lowerKey === '发布' || lowerKey === 'publish' || lowerKey === '已发布') {
+          if (val.checkbox === true) {
+            isPublished = true;
+            break;
           }
         }
       }
-
-      hasMore = response.has_more;
-      startCursor = response.next_cursor;
     }
-  } catch (err) {
-    console.warn(`⚠️ 读取发布台 blocks 遇到问题: ${err.message}`);
+
+    // 2. 兼容 Select 或 Status 类型的发布属性
+    if (!isPublished) {
+      for (const [key, val] of Object.entries(props)) {
+        if (val.type === 'status' || val.type === 'select') {
+          const statusName = val.status?.name || val.select?.name || '';
+          if (statusName === 'Published' || statusName === '已发布' || statusName === '发布') {
+            isPublished = true;
+            break;
+          }
+        }
+      }
+    }
+
+    if (isPublished) {
+      publishedPages.push(page);
+    }
   }
 
-  return Array.from(articleIds);
+  return publishedPages;
 }
 
-// 单篇页面拉取并转换为 Markdown
-async function syncPageById(pageId) {
-  let page;
-  try {
-    page = await notion.pages.retrieve({ page_id: pageId });
-  } catch (error) {
-    console.error(`❌ 无法访问页面 [ID: ${pageId}]:`, error.message);
-    return false;
-  }
-
+// 单篇页面处理与生成 Markdown
+async function syncPage(page) {
+  const pageId = page.id;
   const props = page.properties || {};
 
   // 1. 获取标题
@@ -245,7 +250,7 @@ async function syncPageById(pageId) {
   }
 
   // 6. 转换正文 Blocks 为 Markdown
-  console.log(`📄 正在转换文章 [${title}] 的正文与排版...`);
+  console.log(`📄 正在转换已勾选文章 [${title}] 的正文...`);
   const mdblocks = await n2m.pageToMarkdown(pageId);
   const mdStringObj = n2m.toMarkdownString(mdblocks);
   let contentMarkdown = mdStringObj.parent || '';
@@ -259,7 +264,7 @@ async function syncPageById(pageId) {
     if (!summary) summary = title;
   }
 
-  // 7. 处理图片持久化
+  // 7. 处理图片持久化保存
   contentMarkdown = await downloadAndReplaceImages(contentMarkdown, slug);
 
   // 8. 组装 Frontmatter
@@ -284,48 +289,44 @@ ${contentMarkdown}
 
   const destPath = path.join(postsDir, `${slug}.md`);
   fs.writeFileSync(destPath, fileContent, 'utf-8');
-  console.log(`✨ 成功发布: [${title}] -> content/posts/${slug}.md`);
-  return true;
+  console.log(`✨ 成功上线: [${title}] -> content/posts/${slug}.md`);
+  return slug;
 }
 
 async function main() {
-  console.log('🚀 启动 Notion 博客发布引擎...');
+  console.log('🚀 启动 Notion 勾选发布引擎...');
 
-  let targetIds = [];
+  const publishedPages = await fetchPublishedPagesFromDatabase(DATABASE_ID);
 
-  // 优先情况 A：命令行或环境变量明确指定了单篇文章
-  if (SINGLE_PAGE_INPUT) {
-    const singleId = extractPageId(SINGLE_PAGE_INPUT);
-    if (singleId) {
-      console.log(`🎯 模式: 精准发布单篇文章 (ID: ${singleId})`);
-      targetIds.push(singleId);
-    }
-  }
-
-  // 常规情况 B：从【博客发布台】展架中提取要发布的文章清单
-  if (targetIds.length === 0) {
-    const cleanDashboardId = extractPageId(DASHBOARD_ID);
-    if (cleanDashboardId) {
-      targetIds = await getArticleIdsFromDashboard(cleanDashboardId);
-    }
-  }
-
-  if (targetIds.length === 0) {
-    console.log('ℹ️ 【博客发布台】目前未放置任何要发布的文章。');
-    console.log('   提示：在 Notion 中打开【博客发布台】，打字输入 @文章标题 或拖入子页面，即可将其发布。');
-    console.log('   本次跳过 Notion 同步，保持现有站点内容不变。');
+  if (publishedPages.length === 0) {
+    console.log('ℹ️ 目前没有检测到任何打勾 [x] 的文章。');
+    console.log('   提示：在 Notion 表格中新增一列【发布】(Checkbox 类型)，哪篇想发布就在哪篇点一下打勾。');
+    console.log('   未打勾的文章一概不发布，保持当前站点不变。');
     process.exit(0);
   }
 
-  console.log(`📚 共发现 ${targetIds.length} 篇待发布文章，开始逐一处理...`);
+  console.log(`📚 共检测到 ${publishedPages.length} 篇明确打勾 [x] 的文章，开始同步上线...`);
 
-  let count = 0;
-  for (const id of targetIds) {
-    const ok = await syncPageById(id);
-    if (ok) count++;
+  // 记录本次同步生成的 slug 集合，用于实现去勾自动下架
+  const activeSlugs = new Set();
+
+  for (const page of publishedPages) {
+    const slug = await syncPage(page);
+    if (slug) activeSlugs.add(`${slug}.md`);
   }
 
-  console.log(`\n🎉 发布完成！共成功发布 ${count} 篇文章。`);
+  // 自动下架：如果本地 content/posts/ 中存在过去从 Notion 同步的文章，但在 Notion 中已被取消勾选，则自动删除下架
+  // （保留站点自带的 why-build-this-website.md）
+  const existingFiles = fs.readdirSync(postsDir);
+  for (const file of existingFiles) {
+    if (file === 'why-build-this-website.md' || file.startsWith('_index')) continue;
+    if (!activeSlugs.has(file)) {
+      console.log(`🗑️ 检测到文章 [${file}] 在 Notion 中已取消勾选，自动下架该页面。`);
+      fs.unlinkSync(path.join(postsDir, file));
+    }
+  }
+
+  console.log(`\n🎉 同步上线完成！当前共有 ${activeSlugs.size} 篇 Notion 文章处于已发布状态。`);
 }
 
 main();

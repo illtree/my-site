@@ -4,14 +4,8 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
-    inputs:
-      page_url:
-        description: 'Notion 文章的 Share 链接 (留空则仅重新构建当前站点)'
-        required: false
-        default: ''
-        type: string
-  repository_dispatch:
+  workflow_dispatch: # 支持手动/桌面一键触发
+  repository_dispatch: # 支持外部触发
     types: [notion-publish]
 
 permissions:
@@ -50,23 +44,22 @@ jobs:
       - name: Install Node Dependencies
         run: npm ci
 
-      - name: Sync Post from Notion
+      - name: Sync Published Posts from Notion
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          NOTION_DASHBOARD_ID: ${{ secrets.NOTION_DASHBOARD_ID }}
-          NOTION_PAGE_URL: ${{ inputs.page_url || github.event.client_payload.page_url }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
         run: node scripts/sync-notion.mjs
 
-      - name: Commit & Push synced post to repository
+      - name: Commit & Push synced posts to repository
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add -A content/posts static/images
           if ! git diff --cached --quiet; then
-            git commit -m "chore(notion): publish post from Notion [skip ci]"
+            git commit -m "chore(notion): sync published posts [skip ci]"
             git push
           else
-            echo "No new Notion post to commit."
+            echo "No changes to commit."
           fi
 
       - name: Run Automated Tests
