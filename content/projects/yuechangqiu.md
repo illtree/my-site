@@ -119,7 +119,5 @@ github: "https://github.com/illtree/lets-ball"
 
 ---
 
-<div style="text-align: center; margin-top: 1.5rem;">
-  <img src="/images/yuechangqiu-logo.jpg" alt="来约场球小程序图标" style="width: 200px; max-width: 80%; border-radius: 20px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);" />
-</div>
+![来约场球小程序图标](/images/yuechangqiu-logo.jpg)
 
