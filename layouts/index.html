@@ -2,7 +2,7 @@
 <section class="home wrap">
   <div class="card-grid">
     {{/* 1. 精选项目卡片 */}}
-    {{ range first 3 (where .Site.RegularPages "Section" "projects") }}
+    {{ range first 3 (where .Site.RegularPages.ByDate.Reverse "Section" "projects") }}
     <a class="entry-card" href="{{ .RelPermalink }}">
       <span class="card-top">
         <span class="card-label">项目</span>
@@ -14,17 +14,15 @@
     {{ end }}
 
     {{/* 2. 最新文章卡片 */}}
-    {{ with (first 1 (where .Site.RegularPages "Section" "posts")) }}
-      {{ range . }}
-      <a class="entry-card" href="{{ .RelPermalink }}">
-        <span class="card-top">
-          <span class="card-label">最新文章</span>
-        </span>
-        <strong class="card-title">{{ .Title }}</strong>
-        <span class="card-description">{{ .Summary | plainify | truncate 58 }}</span>
-        <time class="card-status" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006.01.02" }}</time>
-      </a>
-      {{ end }}
+    {{ range first 1 (where .Site.RegularPages.ByDate.Reverse "Section" "posts") }}
+    <a class="entry-card" href="{{ .RelPermalink }}">
+      <span class="card-top">
+        <span class="card-label">最新文章</span>
+      </span>
+      <strong class="card-title">{{ .Title }}</strong>
+      <span class="card-description">{{ .Summary | plainify | truncate 58 }}</span>
+      <time class="card-status" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006.01.02" }}</time>
+    </a>
     {{ end }}
 
     {{/* 3. 画作作品卡片 (支持配置开关) */}}
