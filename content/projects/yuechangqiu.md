@@ -8,16 +8,21 @@ description: "不是踢不动了，是找不到人踢了。以球局为中心、
 github: "https://github.com/illtree/lets-ball"
 ---
 
-<div class="project-badge">
+<div class="project-showcase-box">
+  <div class="project-showcase-logo">
 
 ![来约场球小程序图标](/images/yuechangqiu-logo.jpg)
 
+  </div>
+  <div class="project-showcase-info">
+    <h3>项目状态与开源体验</h3>
+    <ul>
+      <li><strong>运行状态</strong>：项目已经上线</li>
+      <li><strong>体验方式</strong>：微信搜索“<strong>来约场球</strong>”小程序</li>
+      <li><strong>开源地址</strong>：<a href="https://github.com/illtree/lets-ball" target="_blank" rel="noopener">GitHub - illtree/lets-ball</a></li>
+    </ul>
+  </div>
 </div>
-
-> **项目状态与开源体验**
-> - **运行状态**：项目已经上线
-> - **体验方式**：微信搜索“**来约场球**”小程序
-> - **开源地址**：[GitHub - illtree/lets-ball](https://github.com/illtree/lets-ball)
 
 # 不是踢不动了，是找不到人踢了
 
