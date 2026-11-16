@@ -1,7 +1,7 @@
 {{ define "main" }}
 <header class="page-heading wrap">
   <nav class="breadcrumb" aria-label="面包屑路径" style="font-size: 0.85rem; color: var(--quiet); margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.5rem;">
-    <a href="{{ site.Home.RelPermalink }}" style="color: var(--muted); font-weight: 500;">首页</a>
+    <a href="{{ "/" | relURL }}" style="color: var(--muted); font-weight: 500;">首页</a>
     <span style="opacity: 0.4;">/</span>
     <span>{{ if eq .Section "posts" }}文章{{ else if eq .Section "projects" }}项目{{ else if eq .Section "artworks" }}画作{{ else }}{{ .Title }}{{ end }}</span>
   </nav>
