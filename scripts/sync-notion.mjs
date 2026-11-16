@@ -298,31 +298,29 @@ async function main() {
 
   const publishedPages = await fetchPublishedPagesFromDatabase(DATABASE_ID);
 
-  if (publishedPages.length === 0) {
-    console.log('ℹ️ 目前没有检测到任何打勾 [x] 的文章。');
-    console.log('   提示：在 Notion 表格中点勾【Publish】(Checkbox)，哪篇想发布就在哪篇点一下打勾。');
-    console.log('   未打勾的文章一概不发布，保持当前站点不变。');
-    process.exit(0);
-  }
-
-  console.log(`📚 共检测到 ${publishedPages.length} 篇明确打勾 [x] 的文章，开始同步上线...`);
-
   // 记录本次同步生成的 slug 集合，用于实现去勾自动下架
   const activeSlugs = new Set();
 
-  for (const page of publishedPages) {
-    const slug = await syncPage(page);
-    if (slug) activeSlugs.add(`${slug}.md`);
+  if (publishedPages.length === 0) {
+    console.log('ℹ️ 目前没有检测到任何打勾 [x] 的文章，将检查并下架所有已取消勾选的文章。');
+  } else {
+    console.log(`📚 共检测到 ${publishedPages.length} 篇明确打勾 [x] 的文章，开始同步上线...`);
+    for (const page of publishedPages) {
+      const slug = await syncPage(page);
+      if (slug) activeSlugs.add(`${slug}.md`);
+    }
   }
 
-  // 自动下架：如果本地 content/posts/ 中存在过去从 Notion 同步的文章，但在 Notion 中已被取消勾选，则自动删除下架
+  // 自动下架：如果 content/posts/ 中存在过去从 Notion 同步的文章，但在 Notion 中已被取消勾选，则自动删除下架
   // （保留站点自带的 why-build-this-website.md）
-  const existingFiles = fs.readdirSync(postsDir);
-  for (const file of existingFiles) {
-    if (file === 'why-build-this-website.md' || file.startsWith('_index')) continue;
-    if (!activeSlugs.has(file)) {
-      console.log(`🗑️ 检测到文章 [${file}] 在 Notion 中已取消勾选，自动下架该页面。`);
-      fs.unlinkSync(path.join(postsDir, file));
+  if (fs.existsSync(postsDir)) {
+    const existingFiles = fs.readdirSync(postsDir);
+    for (const file of existingFiles) {
+      if (file === 'why-build-this-website.md' || file.startsWith('_index')) continue;
+      if (!activeSlugs.has(file)) {
+        console.log(`🗑️ 检测到文章 [${file}] 在 Notion 中已取消勾选，自动下架该页面。`);
+        fs.unlinkSync(path.join(postsDir, file));
+      }
     }
   }
 
