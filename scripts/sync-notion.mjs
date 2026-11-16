@@ -193,6 +193,18 @@ async function fetchPublishedPagesFromDatabase(databaseId) {
     }
 
     if (isPublished) {
+      // 过滤掉临时占位测试文章
+      let pageTitle = '';
+      for (const val of Object.values(props)) {
+        if (val.type === 'title' && val.title?.length > 0) {
+          pageTitle = val.title.map(t => t.plain_text).join('').trim();
+          break;
+        }
+      }
+      if (pageTitle === '这是一个测试' || pageTitle.toLowerCase() === 'test') {
+        console.log(`⏩ 忽略临时测试占位文章: [${pageTitle}]`);
+        continue;
+      }
       publishedPages.push(page);
     }
   }
