@@ -300,7 +300,7 @@ async function main() {
 
   if (publishedPages.length === 0) {
     console.log('ℹ️ 目前没有检测到任何打勾 [x] 的文章。');
-    console.log('   提示：在 Notion 表格中新增一列【发布】(Checkbox 类型)，哪篇想发布就在哪篇点一下打勾。');
+    console.log('   提示：在 Notion 表格中点勾【Publish】(Checkbox)，哪篇想发布就在哪篇点一下打勾。');
     console.log('   未打勾的文章一概不发布，保持当前站点不变。');
     process.exit(0);
   }
