@@ -566,7 +566,7 @@ main {
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  padding: 1.25rem 1.5rem;
+  padding: 1rem 1.4rem;
   margin: 1.5rem 0 2rem;
   background: var(--card);
   border: 1px solid var(--line);
@@ -585,11 +585,11 @@ main {
 }
 
 .project-showcase-logo img {
-  width: 100px;
-  height: 100px;
-  border-radius: 20px;
+  width: 130px;
+  height: 130px;
+  border-radius: 22px;
   border: 1px solid var(--line);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.07);
   display: block;
   margin: 0;
 }
