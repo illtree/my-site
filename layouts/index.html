@@ -1,39 +1,23 @@
 {{ define "main" }}
 <section class="home wrap">
   <div class="card-grid">
-    {{/* 1. 精选项目卡片 */}}
-    {{ range first 3 (where .Site.RegularPages.ByDate.Reverse "Section" "projects") }}
+    {{/* 聚合全站文章、项目与画作，统一严格按时间倒序排列展示 */}}
+    {{ range (where .Site.RegularPages.ByDate.Reverse "Section" "in" (slice "posts" "projects" "artworks")) }}
     <a class="entry-card" href="{{ .RelPermalink }}">
       <span class="card-top">
-        <span class="card-label">项目</span>
+        <span class="card-label">
+          {{- if eq .Section "posts" }}文章
+          {{- else if eq .Section "projects" }}项目
+          {{- else if eq .Section "artworks" }}画作
+          {{- else }}{{ .Section }}{{ end -}}
+        </span>
       </span>
       <strong class="card-title">{{ .Title }}</strong>
-      <span class="card-description">{{ .Description | default .Summary }}</span>
-      <span class="card-status">{{ with .Params.status }}{{ . }}{{ else }}个人项目{{ end }}</span>
-    </a>
-    {{ end }}
-
-    {{/* 2. 最新文章卡片 */}}
-    {{ range first 1 (where .Site.RegularPages.ByDate.Reverse "Section" "posts") }}
-    <a class="entry-card" href="{{ .RelPermalink }}">
-      <span class="card-top">
-        <span class="card-label">最新文章</span>
+      <span class="card-description">{{ .Description | default .Summary | plainify | truncate 68 }}</span>
+      <span class="card-status">
+        {{- with .Params.status }}{{ . }} · {{ end -}}
+        <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006.01.02" }}</time>
       </span>
-      <strong class="card-title">{{ .Title }}</strong>
-      <span class="card-description">{{ .Summary | plainify | truncate 58 }}</span>
-      <time class="card-status" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2006.01.02" }}</time>
-    </a>
-    {{ end }}
-
-    {{/* 3. 画作作品卡片 (支持配置开关) */}}
-    {{ if .Site.Params.showArtworks }}
-    <a class="entry-card" href="{{ "artworks/" | relURL }}">
-      <span class="card-top">
-        <span class="card-label">画作</span>
-      </span>
-      <strong class="card-title">图画作品</strong>
-      <span class="card-description">一页收集画画作品。</span>
-      <span class="card-status">作品集</span>
     </a>
     {{ end }}
   </div>

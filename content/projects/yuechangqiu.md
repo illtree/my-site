@@ -8,6 +8,12 @@ description: "不是踢不动了，是找不到人踢了。以球局为中心、
 github: "https://github.com/illtree/lets-ball"
 ---
 
+<div class="project-badge">
+
+![来约场球小程序图标](/images/yuechangqiu-logo.jpg)
+
+</div>
+
 > **项目状态与开源体验**
 > - **运行状态**：项目已经上线
 > - **体验方式**：微信搜索“**来约场球**”小程序
@@ -117,7 +123,4 @@ github: "https://github.com/illtree/lets-ball"
 
 等所有公立大、中、小学在非教学时段开放运动场，或许才有可能吧。
 
----
-
-![来约场球小程序图标](/images/yuechangqiu-logo.jpg)
 
