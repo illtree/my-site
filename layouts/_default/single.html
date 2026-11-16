@@ -1,7 +1,7 @@
 {{ define "main" }}
 <article class="article wrap">
   <nav class="breadcrumb" aria-label="面包屑路径" style="font-size: 0.85rem; color: var(--quiet); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-    <a href="{{ "/" | relURL }}" style="color: var(--muted); font-weight: 500;">首页</a>
+    <a href="{{ site.Home.RelPermalink }}" style="color: var(--muted); font-weight: 500;">首页</a>
     <span style="opacity: 0.4;">/</span>
     <a href="{{ .Section | relURL }}" style="color: var(--muted);">{{ if eq .Section "posts" }}文章{{ else if eq .Section "artworks" }}画作{{ else }}项目{{ end }}</a>
     <span style="opacity: 0.4;">/</span>
@@ -31,7 +31,7 @@
 
   <footer style="margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px dashed var(--line); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
     <div style="display: flex; align-items: center; gap: 1.25rem;">
-      <a href="{{ "/" | relURL }}" style="color: var(--accent); font-weight: 500; font-size: 0.95rem;">返回首页</a>
+      <a href="{{ site.Home.RelPermalink }}" style="color: var(--accent); font-weight: 500; font-size: 0.95rem;">返回首页</a>
       <span style="color: var(--line);">|</span>
       <a href="{{ .Section | relURL }}" style="color: var(--muted); font-size: 0.95rem;">返回{{ if eq .Section "posts" }}文章{{ else if eq .Section "artworks" }}画作{{ else }}项目{{ end }}列表</a>
     </div>
