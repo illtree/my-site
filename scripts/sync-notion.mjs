@@ -39,7 +39,19 @@ function loadEnv() {
 loadEnv();
 
 const NOTION_TOKEN = process.env.NOTION_TOKEN;
-const DATABASE_ID = process.env.NOTION_DATABASE_ID || '40d46488-a2a8-4108-ab3c-262350fbe99a';
+
+// 预设支持的 Notion 数据库列表：随想、Diary (日记)
+const DEFAULT_DATABASES = [
+  '40d46488-a2a8-4108-ab3c-262350fbe99a', // 随想
+  'c2427ada-0ba2-4d47-bff1-962e26c24367', // Diary (日记)
+];
+
+const envDbIds = (process.env.NOTION_DATABASE_ID || '')
+  .split(',')
+  .map(s => s.trim())
+  .filter(Boolean);
+
+const TARGET_DATABASES = Array.from(new Set([...DEFAULT_DATABASES, ...envDbIds]));
 
 if (!NOTION_TOKEN) {
   console.log('💡 [Notion 同步] 未检测到 NOTION_TOKEN 环境变量，跳过 Notion 同步。');
@@ -296,7 +308,11 @@ ${contentMarkdown}
 async function main() {
   console.log('🚀 启动 Notion 勾选发布引擎...');
 
-  const publishedPages = await fetchPublishedPagesFromDatabase(DATABASE_ID);
+  const publishedPages = [];
+  for (const dbId of TARGET_DATABASES) {
+    const pages = await fetchPublishedPagesFromDatabase(dbId);
+    publishedPages.push(...pages);
+  }
 
   // 记录本次同步生成的 slug 集合，用于实现去勾自动下架
   const activeSlugs = new Set();
