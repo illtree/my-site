@@ -33,7 +33,7 @@ try {
   if (hasChanges) {
     execSync('git commit -m "feat(blog): sync published posts from obsidian"', { cwd: rootDir, stdio: 'inherit' });
     console.log('\n🚀 正在推送到 GitHub 远端仓库 (触发 Cloudflare & GitHub Pages 自动构建)...');
-    execSync('git push origin main', { cwd: rootDir, stdio: 'inherit' });
+    execSync('git push origin main main:master', { cwd: rootDir, stdio: 'inherit' });
     console.log('\n==============================================');
     console.log('  [OK] 同步完成！文章已成功推送到 GitHub！');
     console.log('  约 20-30 秒后线上网站自动更新生效。');
