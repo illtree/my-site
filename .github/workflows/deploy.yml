@@ -44,25 +44,6 @@ jobs:
       - name: Install Node Dependencies
         run: npm ci
 
-      - name: Sync Published Posts from Notion
-        env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
-        run: node scripts/sync-notion.mjs
-
-      - name: Commit & Push synced posts to repository
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A content/posts static/images
-          if ! git diff --cached --quiet; then
-            git commit -m "chore(notion): sync published posts [skip actions]"
-            git push origin main
-            git push origin main:master
-          else
-            echo "No changes to commit."
-          fi
-
       - name: Run Automated Tests
         run: npm test
 

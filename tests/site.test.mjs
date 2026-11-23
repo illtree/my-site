@@ -227,8 +227,11 @@ describe('Folio 个人数字空间工程自动化测试套件', () => {
     const publishCmd = path.join(rootDir, 'publish-blog.cmd');
     assert.ok(fs.existsSync(publishCmd), '根目录必须提供 publish-blog.cmd 一键发布脚本');
     const cmdContent = fs.readFileSync(publishCmd, 'utf-8');
-    assert.ok(cmdContent.includes('sync-obsidian.mjs'), 'publish-blog.cmd 必须集成 Obsidian 同步引擎');
-    assert.ok(cmdContent.includes('npm test'), 'publish-blog.cmd 必须在推送前执行自动化回归测试防呆');
+    assert.ok(cmdContent.includes('publish.mjs') || cmdContent.includes('sync-obsidian.mjs'), 'publish-blog.cmd 必须集成发布引擎');
+    const publishScript = path.join(rootDir, 'scripts', 'publish.mjs');
+    assert.ok(fs.existsSync(publishScript), '必须提供 scripts/publish.mjs 发布工作流');
+    const pubContent = fs.readFileSync(publishScript, 'utf-8');
+    assert.ok(pubContent.includes('npm test'), 'publish.mjs 必须在推送前执行自动化回归测试防呆');
 
     const pkgJson = JSON.parse(fs.readFileSync(path.join(rootDir, 'package.json'), 'utf-8'));
     assert.ok(pkgJson.scripts['sync:obsidian'], 'package.json 必须包含 sync:obsidian 命令');
