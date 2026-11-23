@@ -721,7 +721,7 @@ main {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
+  gap: 16px;
   border: 1px solid var(--line);
   border-radius: 10px;
   background: var(--card);
@@ -734,9 +734,64 @@ main {
   transform: translateY(-1px);
 }
 
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .contact-card strong {
   font-size: 13px;
   color: var(--accent);
+  letter-spacing: 0.02em;
+}
+
+.contact-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.copy-btn, .mail-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-family: inherit;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.copy-btn {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+
+.copy-btn:hover {
+  background: var(--accent);
+  color: var(--page);
+}
+
+.copy-btn.copied {
+  background: var(--accent);
+  color: var(--page);
+  border-color: var(--accent);
+}
+
+.mail-btn {
+  background: var(--page);
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+
+.mail-btn:hover {
+  border-color: var(--ink);
 }
 
 /* ================= Responsive ================= */

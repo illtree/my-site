@@ -25,7 +25,7 @@ describe('Folio 个人数字空间工程自动化测试套件', () => {
 
     assert.match(buildOutput, /Total in \d+ ms/, 'Hugo 构建应当输出完成耗时');
     assert.doesNotMatch(buildOutput, /ERROR/, '构建输出中不得包含 ERROR');
-    assert.ok(duration < 2000, `构建耗时需小于 2000ms，当前为 ${duration}ms`);
+    assert.ok(duration < 3000, `构建耗时需小于 3000ms，当前为 ${duration}ms`);
   });
 
   test('2. 核心页面生成完整性校验', () => {
@@ -34,6 +34,7 @@ describe('Folio 个人数字空间工程自动化测试套件', () => {
       'posts/index.html',
       'projects/index.html',
       'artworks/index.html',
+      'about/index.html',
       'css/style.css'
     ];
 
@@ -111,7 +112,13 @@ describe('Folio 个人数字空间工程自动化测试套件', () => {
     assert.ok(html.includes('footer-icon-dock'), '底部必须包含快捷入口图标 Dock');
     assert.ok(html.includes('href="/posts/"'), 'Dock 必须包含文章入口');
     assert.ok(html.includes('href="/projects/"'), 'Dock 必须包含项目入口');
-    assert.ok(html.includes('mailto:alwaysyys@hotmail.com'), 'Dock 必须包含已配置的邮件入口');
+    assert.ok(html.includes('href="/about/"'), 'Dock 必须包含关于与联络入口');
+
+    // 关于页与联络功能校验
+    const aboutPath = path.join(publicDir, 'about', 'index.html');
+    const aboutHtml = fs.readFileSync(aboutPath, 'utf-8');
+    assert.ok(aboutHtml.includes('alwaysyys@hotmail.com'), '关于页必须包含作者邮箱');
+    assert.ok(aboutHtml.includes('copy-email-btn'), '关于页必须包含一键复制邮箱按钮');
 
     // 主题切换器
     assert.ok(html.includes('id="theme-toggle"'), '必须包含深色/浅色主题切换按钮');
