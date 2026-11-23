@@ -220,4 +220,18 @@ describe('Folio 个人数字空间工程自动化测试套件', () => {
     assert.ok(cssStat.size < 50 * 1024, `CSS 文件体积需小于 50KB，当前为 ${(cssStat.size / 1024).toFixed(2)} KB`);
   });
 
+  test('8. Obsidian 勾选发布引擎与工作流契约', () => {
+    const syncScript = path.join(rootDir, 'scripts', 'sync-obsidian.mjs');
+    assert.ok(fs.existsSync(syncScript), '必须提供 scripts/sync-obsidian.mjs 同步脚本');
+
+    const publishCmd = path.join(rootDir, 'publish-blog.cmd');
+    assert.ok(fs.existsSync(publishCmd), '根目录必须提供 publish-blog.cmd 一键发布脚本');
+    const cmdContent = fs.readFileSync(publishCmd, 'utf-8');
+    assert.ok(cmdContent.includes('sync-obsidian.mjs'), 'publish-blog.cmd 必须集成 Obsidian 同步引擎');
+    assert.ok(cmdContent.includes('npm test'), 'publish-blog.cmd 必须在推送前执行自动化回归测试防呆');
+
+    const pkgJson = JSON.parse(fs.readFileSync(path.join(rootDir, 'package.json'), 'utf-8'));
+    assert.ok(pkgJson.scripts['sync:obsidian'], 'package.json 必须包含 sync:obsidian 命令');
+  });
+
 });

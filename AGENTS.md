@@ -63,12 +63,17 @@ d:\my-site\
 │   ├── projects/           # 项目列表与详情
 │   └── artworks/           # 画作列表与详情
 ├── static/                 # 纯静态资源（直接复制到 public/）
-│   └── css/style.css       # 核心样式表与色彩变量
+│   ├── css/style.css       # 核心样式表与色彩变量
+│   └── images/posts/       # 文章配图静态资产库
+├── scripts/                # 自动化工具链
+│   ├── sync-obsidian.mjs   # Obsidian 勾选发布提取引擎
+│   └── sync-notion.mjs     # Notion 云端提取脚本
 ├── tests/                  # 自动化回归测试套件
 │   └── site.test.mjs       # 构建、死链、契约全量断言
 ├── AGENTS.md               # 本规范文档
 ├── 业务逻辑链条.md          # 业务与内容生命周期单一真源
 ├── 上线前验收清单.md        # 端到端品控验收剧本
+├── publish-blog.cmd        # Windows 一键勾选发布与云端同步脚本
 └── 启动本地预览.cmd        # Windows 一键本地热重载预览脚本
 ```
 
