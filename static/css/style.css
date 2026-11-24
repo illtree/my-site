@@ -741,7 +741,7 @@ main {
 }
 
 .contact-card strong {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--accent);
   letter-spacing: 0.02em;
 }
