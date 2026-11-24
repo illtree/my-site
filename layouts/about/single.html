@@ -21,7 +21,7 @@
     <span class="about-monogram">{{ with .Site.Params.name }}{{ substr . 0 1 }}{{ else }}我{{ end }}</span>
     <div>
       <strong>{{ .Site.Params.name | default .Site.Params.author }}</strong>
-      <span>{{ .Site.Params.location }}</span>
+      {{ with .Site.Params.location }}<span>{{ . }}</span>{{ end }}
     </div>
   </div>
 
