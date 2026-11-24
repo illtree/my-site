@@ -29,64 +29,10 @@
     {{ .Content }}
   </div>
 
-  <div class="contact-card">
-    <div class="contact-info">
-      <strong id="email-address">{{ .Site.Params.email }}</strong>
-    </div>
-    <div class="contact-actions">
-      <button type="button" id="copy-email-btn" class="copy-btn" aria-label="复制邮箱地址" title="复制邮箱地址">
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-        </svg>
-        <span id="copy-btn-text">复制邮箱</span>
-      </button>
-      <a class="mail-btn" href="mailto:{{ .Site.Params.email }}" title="调用本地邮件客户端" aria-label="发送邮件">
-        发送邮件
-      </a>
-    </div>
-  </div>
-
-  <script>
-    (function() {
-      const copyBtn = document.getElementById('copy-email-btn');
-      const emailElem = document.getElementById('email-address');
-      const copyText = document.getElementById('copy-btn-text');
-      if (!copyBtn || !emailElem || !copyText) return;
-
-      copyBtn.addEventListener('click', function() {
-        const email = emailElem.textContent.trim();
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(email).then(showSuccess, fallbackCopy);
-        } else {
-          fallbackCopy();
-        }
-
-        function fallbackCopy() {
-          const temp = document.createElement('textarea');
-          temp.value = email;
-          temp.setAttribute('readonly', '');
-          temp.style.position = 'absolute';
-          temp.style.left = '-9999px';
-          document.body.appendChild(temp);
-          temp.select();
-          document.execCommand('copy');
-          document.body.removeChild(temp);
-          showSuccess();
-        }
-
-        function showSuccess() {
-          const original = copyText.textContent;
-          copyText.textContent = '已复制 ✓';
-          copyBtn.classList.add('copied');
-          setTimeout(function() {
-            copyText.textContent = original;
-            copyBtn.classList.remove('copied');
-          }, 2000);
-        }
-      });
-    })();
-  </script>
+  <a class="contact-card" href="mailto:{{ .Site.Params.email }}" aria-label="E-Mail：{{ .Site.Params.email }}">
+    <span class="contact-label">E-Mail：</span>
+    <strong id="email-address">{{ .Site.Params.email }}</strong>
+  </a>
 
   <footer style="margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px dashed var(--line); display: flex; justify-content: space-between; align-items: center;">
     <a href="{{ site.Home.RelPermalink }}" style="color: var(--accent); font-weight: 500; font-size: 0.95rem;">返回首页</a>

@@ -118,7 +118,7 @@ describe('Folio 个人数字空间工程自动化测试套件', () => {
     const aboutPath = path.join(publicDir, 'about', 'index.html');
     const aboutHtml = fs.readFileSync(aboutPath, 'utf-8');
     assert.ok(aboutHtml.includes('alwaysyys@hotmail.com'), '关于页必须包含作者邮箱');
-    assert.ok(aboutHtml.includes('copy-email-btn'), '关于页必须包含一键复制邮箱按钮');
+    assert.ok(aboutHtml.includes('E-Mail：'), '关于页必须包含 E-Mail 前缀');
 
     // 主题切换器
     assert.ok(html.includes('id="theme-toggle"'), '必须包含深色/浅色主题切换按钮');

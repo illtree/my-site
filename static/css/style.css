@@ -717,15 +717,16 @@ main {
 
 .contact-card {
   margin-top: 28px;
-  padding: 16px 20px;
-  display: flex;
-  justify-content: space-between;
+  padding: 14px 20px;
+  display: inline-flex;
   align-items: center;
-  gap: 16px;
+  gap: 8px;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: 8px;
   background: var(--card);
   font-size: 14px;
+  color: var(--ink);
+  text-decoration: none;
   transition: border-color 0.15s, transform 0.15s;
 }
 
@@ -734,64 +735,15 @@ main {
   transform: translateY(-1px);
 }
 
-.contact-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+.contact-card .contact-label {
+  color: var(--muted);
+  font-weight: 500;
 }
 
 .contact-card strong {
   font-size: 14px;
   color: var(--accent);
   letter-spacing: 0.02em;
-}
-
-.contact-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-.copy-btn, .mail-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  font-size: 13px;
-  font-family: inherit;
-  border-radius: 6px;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all 0.15s ease;
-  white-space: nowrap;
-}
-
-.copy-btn {
-  background: transparent;
-  color: var(--accent);
-  border: 1px solid var(--accent);
-}
-
-.copy-btn:hover {
-  background: var(--accent);
-  color: var(--page);
-}
-
-.copy-btn.copied {
-  background: var(--accent);
-  color: var(--page);
-  border-color: var(--accent);
-}
-
-.mail-btn {
-  background: var(--page);
-  color: var(--ink);
-  border: 1px solid var(--line);
-}
-
-.mail-btn:hover {
-  border-color: var(--ink);
 }
 
 /* ================= Responsive ================= */
@@ -914,11 +866,6 @@ main {
 
   .artwork-grid {
     padding-bottom: 20px;
-  }
-
-  .contact-card {
-    flex-direction: column;
-    align-items: flex-start;
   }
 }
 
